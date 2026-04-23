@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crypto Wallet AML Risk Profiler</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <p class="eyebrow">Hackathon MVP</p>
+        <h1>Crypto Wallet AML Risk Profiler</h1>
+        <p class="subtitle">
+          Explainable, deterministic wallet risk scoring for investor due diligence.
+        </p>
+      </header>
+
+      <section class="panel">
+        <h2>Input</h2>
+        <div class="grid">
+          <label>
+            Network
+            <select id="networkSelect">
+              <option value="Ethereum">Ethereum</option>
+              <option value="Bitcoin">Bitcoin</option>
+              <option value="Polygon">Polygon</option>
+            </select>
+          </label>
+          <label>
+            Wallet address
+            <input
+              id="walletAddress"
+              type="text"
+              placeholder="0xabc123... or bc1..."
+              autocomplete="off"
+            />
+          </label>
+        </div>
+        <div class="button-row">
+          <button id="analyzeBtn">Analyze Wallet</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Demo Scenarios</h2>
+        <div class="button-row">
+          <button class="scenario-btn" data-scenario="clean">Clean Wallet</button>
+          <button class="scenario-btn" data-scenario="medium">Mixer Exposure</button>
+          <button class="scenario-btn" data-scenario="high">Sanctions Adjacent</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>CSV Upload (optional)</h2>
+        <p class="hint">
+          Upload a CSV with one row containing any of these columns:
+          sanctions_adjacent, mixer_interactions, high_velocity_burst, wallet_age_days,
+          flagged_entity_exposure, cross_chain_hops, risky_counterparty_ratio, structured_amounts,
+          privacy_coin_exposure.
+        </p>
+        <input id="csvInput" type="file" accept=".csv,text/csv" />
+      </section>
+
+      <section class="panel report" id="reportPanel">
+        <h2>Risk Report</h2>
+        <div class="kpis">
+          <article>
+            <p class="kpi-label">Risk Score</p>
+            <p class="kpi-value" id="riskScore">--</p>
+          </article>
+          <article>
+            <p class="kpi-label">Risk Tier</p>
+            <p class="kpi-value" id="riskTier">--</p>
+          </article>
+          <article>
+            <p class="kpi-label">Recommended Action</p>
+            <p class="kpi-value" id="riskAction">--</p>
+          </article>
+        </div>
+        <h3>Why this score?</h3>
+        <ul id="factorList" class="factor-list">
+          <li>Run an analysis to see contributing factors.</li>
+        </ul>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

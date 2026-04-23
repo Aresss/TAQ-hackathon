@@ -1,0 +1,9 @@
+{
+  "name": "crypto-wallet-aml-risk-profiler",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Hackathon MVP with deterministic wallet AML scoring and local file logging.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

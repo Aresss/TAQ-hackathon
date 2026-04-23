@@ -1,0 +1,2 @@
+wallet_address,network,sanctions_adjacent,mixer_interactions,high_velocity_burst,wallet_age_days,flagged_entity_exposure,cross_chain_hops,risky_counterparty_ratio,structured_amounts,privacy_coin_exposure
+0xabc123abc123abc123abc123abc123abc123abcd,Ethereum,1,4,true,14,2,6,0.41,true,3
