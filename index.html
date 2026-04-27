@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Crypto Wallet AML Risk Profiler</title>
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <main class="app-shell">
@@ -16,105 +22,111 @@
         </p>
       </header>
 
-      <section class="panel">
-        <h2>Input</h2>
-        <div class="grid">
-          <label>
-            Network
-            <select id="networkSelect">
-              <option value="Ethereum">Ethereum</option>
-              <option value="Bitcoin">Bitcoin</option>
-              <option value="Polygon">Polygon</option>
-            </select>
-          </label>
-          <label>
-            Wallet address
-            <input
-              id="walletAddress"
-              type="text"
-              placeholder="0xabc123... or bc1..."
-              autocomplete="off"
-            />
-          </label>
+      <div class="columns">
+        <div class="col-left">
+          <section class="panel">
+            <h2><span class="icon">&#x1F50D;</span> Wallet Input</h2>
+            <div class="grid">
+              <label>
+                Network
+                <select id="networkSelect">
+                  <option value="Ethereum">Ethereum</option>
+                  <option value="Bitcoin">Bitcoin</option>
+                  <option value="Polygon">Polygon</option>
+                </select>
+              </label>
+              <label>
+                Wallet address
+                <input
+                  id="walletAddress"
+                  type="text"
+                  placeholder="0xabc123... or bc1..."
+                  autocomplete="off"
+                />
+              </label>
+            </div>
+            <div class="button-row">
+              <button id="analyzeBtn" class="btn-primary">Analyze Wallet</button>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2><span class="icon">&#x26A1;</span> Demo Scenarios</h2>
+            <p class="hint">
+              Test with real wallets — from clean to OFAC-sanctioned:
+            </p>
+            <div class="button-row">
+              <button class="scenario-btn scenario-low" data-scenario="clean">Vitalik (Clean)</button>
+              <button class="scenario-btn scenario-med" data-scenario="medium">Tornado Cash User</button>
+              <button class="scenario-btn scenario-high" data-scenario="high">Ronin Exploiter (OFAC)</button>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2><span class="icon">&#x1F4C4;</span> CSV Upload</h2>
+            <p class="hint">
+              Upload a CSV with wallet risk signal columns.
+            </p>
+            <input id="csvInput" type="file" accept=".csv,text/csv" />
+          </section>
+
+          <section class="panel chat-section" id="chatPanel">
+            <h2><span class="icon">&#x1F4AC;</span> Investigation Chat</h2>
+            <p class="hint">Ask follow-up questions with wallet context.</p>
+            <div id="chatMessages" class="chat-messages"></div>
+            <div class="chat-input-row">
+              <input id="chatInput" type="text" placeholder="Ask about this wallet..." autocomplete="off" />
+              <button id="chatSendBtn" class="btn-primary">Send</button>
+            </div>
+          </section>
         </div>
-        <div class="button-row">
-          <button id="analyzeBtn">Analyze Wallet</button>
+
+        <div class="col-right">
+          <section class="panel report" id="reportPanel">
+            <h2><span class="icon">&#x1F4CA;</span> Risk Report</h2>
+            <div class="kpis">
+              <article class="kpi-card">
+                <p class="kpi-label">Risk Score</p>
+                <p class="kpi-value kpi-score" id="riskScore">--</p>
+              </article>
+              <article class="kpi-card">
+                <p class="kpi-label">Risk Tier</p>
+                <p class="kpi-value" id="riskTier">--</p>
+              </article>
+              <article class="kpi-card">
+                <p class="kpi-label">Action</p>
+                <p class="kpi-value" id="riskAction">--</p>
+              </article>
+            </div>
+            <h3>Why this score?</h3>
+            <ul id="factorList" class="factor-list">
+              <li>Run an analysis to see contributing factors.</li>
+            </ul>
+          </section>
+
+          <details class="panel collapsible" id="osintPanel" open>
+            <summary>
+              <span class="icon">&#x1F30D;</span> OSINT Research <span class="spinner" id="osintSpinner"></span>
+            </summary>
+            <p class="ai-badge">Enriched by Perplexity Sonar API &middot; Real-time OSINT across OFAC, Etherscan, Chainabuse &amp; more</p>
+            <div id="osintContent" class="ai-content">Run an analysis to see OSINT results.</div>
+            <div id="osintCitations" class="citations"></div>
+          </details>
+
+          <details class="panel collapsible" id="narrativePanel" open>
+            <summary>
+              <span class="icon">&#x1F4DD;</span> Compliance Narrative <span class="spinner" id="narrativeSpinner"></span>
+            </summary>
+            <p class="ai-badge">Generated by Perplexity Sonar API &middot; SAR-ready compliance narrative with cited sources</p>
+            <div id="narrativeContent" class="ai-content">Run an analysis to generate a narrative.</div>
+            <div id="narrativeCitations" class="citations"></div>
+          </details>
         </div>
-      </section>
+      </div>
 
-      <section class="panel">
-        <h2>Demo Scenarios</h2>
-        <p class="hint">
-          Load deterministic sample profiles to show how risk changes from low to high:
-        </p>
-        <div class="button-row">
-          <button class="scenario-btn" data-scenario="clean">Clean Wallet</button>
-          <button class="scenario-btn" data-scenario="medium">Mixer Exposure</button>
-          <button class="scenario-btn" data-scenario="high">Sanctions Adjacent</button>
-        </div>
-        <p class="hint">
-          <strong>Clean Wallet:</strong> minimal risk signals, expected low-risk score.
-          <strong>Mixer Exposure:</strong> moderate obfuscation behavior, expected manual review.
-          <strong>Sanctions Adjacent:</strong> multiple severe red flags, expected escalation.
-        </p>
-      </section>
-
-      <section class="panel">
-        <h2>CSV Upload (optional)</h2>
-        <p class="hint">
-          Upload a CSV with one row containing any of these columns:
-          sanctions_adjacent, mixer_interactions, high_velocity_burst, wallet_age_days,
-          flagged_entity_exposure, cross_chain_hops, risky_counterparty_ratio, structured_amounts,
-          privacy_coin_exposure.
-        </p>
-        <input id="csvInput" type="file" accept=".csv,text/csv" />
-      </section>
-
-      <section class="panel report" id="reportPanel">
-        <h2>Risk Report</h2>
-        <div class="kpis">
-          <article>
-            <p class="kpi-label">Risk Score</p>
-            <p class="kpi-value" id="riskScore">--</p>
-          </article>
-          <article>
-            <p class="kpi-label">Risk Tier</p>
-            <p class="kpi-value" id="riskTier">--</p>
-          </article>
-          <article>
-            <p class="kpi-label">Recommended Action</p>
-            <p class="kpi-value" id="riskAction">--</p>
-          </article>
-        </div>
-        <h3>Why this score?</h3>
-        <ul id="factorList" class="factor-list">
-          <li>Run an analysis to see contributing factors.</li>
-        </ul>
-      </section>
-
-      <section class="panel" id="osintPanel">
-        <h2>OSINT Research <span class="spinner" id="osintSpinner"></span></h2>
-        <p class="hint">AI-powered open-source intelligence search for this wallet address.</p>
-        <div id="osintContent" class="ai-content">Run an analysis to see OSINT results.</div>
-        <div id="osintCitations" class="citations"></div>
-      </section>
-
-      <section class="panel" id="narrativePanel">
-        <h2>Compliance Narrative <span class="spinner" id="narrativeSpinner"></span></h2>
-        <p class="hint">SAR-ready investigation narrative combining scoring and OSINT findings.</p>
-        <div id="narrativeContent" class="ai-content">Run an analysis to generate a narrative.</div>
-        <div id="narrativeCitations" class="citations"></div>
-      </section>
-
-      <section class="panel" id="chatPanel">
-        <h2>Investigation Chat</h2>
-        <p class="hint">Ask follow-up questions. Perplexity AI searches in real-time with wallet context.</p>
-        <div id="chatMessages" class="chat-messages"></div>
-        <div class="chat-input-row">
-          <input id="chatInput" type="text" placeholder="Ask about this wallet..." autocomplete="off" />
-          <button id="chatSendBtn">Send</button>
-        </div>
-      </section>
+      <footer class="app-footer">
+        <p>Powered by <strong>Perplexity AI</strong> &middot; Deterministic AML Risk Engine &middot; Hackathon MVP</p>
+      </footer>
     </main>
 
     <script src="./app.js"></script>

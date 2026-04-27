@@ -75,9 +75,9 @@ const RULES = [
 
 const SCENARIOS = {
   clean: {
-    address: "0x11aa22bb33cc44dd55ee66ff77889900aabbccdd",
+    address: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
     network: "Ethereum",
-    sourceLabel: "demo scenario: clean wallet",
+    sourceLabel: "demo scenario: clean wallet (Vitalik Buterin public wallet)",
     sanctions_adjacent: 0,
     mixer_interactions: 0,
     high_velocity_burst: false,
@@ -89,9 +89,9 @@ const SCENARIOS = {
     privacy_coin_exposure: 0
   },
   medium: {
-    address: "0xbbbb22bb33cc44dd55ee66ff77889900aabb88ef",
+    address: "0x179f48C78f57A3A78f0608cC9197B8972921d1D2",
     network: "Ethereum",
-    sourceLabel: "demo scenario: mixer exposure",
+    sourceLabel: "demo scenario: mixer exposure (known Tornado Cash depositor)",
     sanctions_adjacent: 0,
     mixer_interactions: 3,
     high_velocity_burst: true,
@@ -103,9 +103,9 @@ const SCENARIOS = {
     privacy_coin_exposure: 0
   },
   high: {
-    address: "0xdead22bb33cc44dd55ee66ff77889900aabc9999",
+    address: "0x098B716B8Aaf21512996dC57EB0615e2383E2f96",
     network: "Ethereum",
-    sourceLabel: "demo scenario: sanctions adjacent",
+    sourceLabel: "demo scenario: OFAC sanctioned (Ronin Bridge exploiter / Lazarus Group)",
     sanctions_adjacent: 2,
     mixer_interactions: 6,
     high_velocity_burst: true,
