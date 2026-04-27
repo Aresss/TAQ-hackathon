@@ -164,3 +164,94 @@ button:hover {
 .tier-high {
   color: var(--high);
 }
+
+/* AI content blocks */
+.ai-content {
+  white-space: pre-wrap;
+  line-height: 1.55;
+  color: var(--muted);
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+/* Citations */
+.citations ul {
+  padding-left: 20px;
+  margin: 4px 0 0;
+}
+
+.citations a {
+  color: var(--accent);
+  word-break: break-all;
+  font-size: 13px;
+}
+
+/* Spinner */
+.spinner {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--panel-border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Chat panel */
+.chat-messages {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-bubble {
+  padding: 10px 14px;
+  border-radius: 12px;
+  max-width: 85%;
+  font-size: 14px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.chat-user {
+  background: linear-gradient(180deg, #3763d8, #2548a8);
+  align-self: flex-end;
+  color: var(--text);
+}
+
+.chat-assistant {
+  background: #1a2340;
+  border: 1px solid var(--panel-border);
+  align-self: flex-start;
+  color: var(--muted);
+}
+
+.chat-citations {
+  align-self: flex-start;
+  font-size: 12px;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input-row input {
+  flex: 1;
+}
+
+.chat-input-row button {
+  flex-shrink: 0;
+  padding: 10px 20px;
+}

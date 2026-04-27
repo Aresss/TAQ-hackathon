@@ -126,7 +126,23 @@ const nodes = {
   riskScore: document.getElementById("riskScore"),
   riskTier: document.getElementById("riskTier"),
   riskAction: document.getElementById("riskAction"),
-  factorList: document.getElementById("factorList")
+  factorList: document.getElementById("factorList"),
+  osintContent: document.getElementById("osintContent"),
+  osintCitations: document.getElementById("osintCitations"),
+  osintSpinner: document.getElementById("osintSpinner"),
+  narrativeContent: document.getElementById("narrativeContent"),
+  narrativeCitations: document.getElementById("narrativeCitations"),
+  narrativeSpinner: document.getElementById("narrativeSpinner"),
+  chatMessages: document.getElementById("chatMessages"),
+  chatInput: document.getElementById("chatInput"),
+  chatSendBtn: document.getElementById("chatSendBtn")
+};
+
+const aiState = {
+  currentProfile: null,
+  currentReport: null,
+  osintResult: null,
+  chatHistory: []
 };
 
 async function logWalletCheck(profile, report) {
@@ -154,6 +170,149 @@ async function logWalletCheck(profile, report) {
   } catch (_err) {
     // Logging should not block the UI scoring flow.
   }
+}
+
+async function fetchPerplexity(endpoint, payload) {
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: "Request failed" }));
+    throw new Error(err.error || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+function renderCitations(citations, container) {
+  container.innerHTML = "";
+  if (!citations || citations.length === 0) return;
+  const heading = document.createElement("p");
+  heading.innerHTML = "<strong>Sources:</strong>";
+  container.appendChild(heading);
+  const ul = document.createElement("ul");
+  citations.forEach((url) => {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = url;
+    li.appendChild(a);
+    ul.appendChild(li);
+  });
+  container.appendChild(ul);
+}
+
+async function runOsint(profile, report) {
+  nodes.osintSpinner.style.display = "inline-block";
+  nodes.osintContent.textContent = "";
+  nodes.osintCitations.innerHTML = "";
+
+  try {
+    const result = await fetchPerplexity("/api/osint", {
+      address: profile.address,
+      network: profile.network,
+      score: report.score,
+      tier: report.tier,
+      factors: report.factors
+    });
+    aiState.osintResult = result;
+    nodes.osintContent.textContent = result.content;
+    renderCitations(result.citations, nodes.osintCitations);
+  } catch (err) {
+    nodes.osintContent.textContent = `OSINT research failed: ${err.message}`;
+  } finally {
+    nodes.osintSpinner.style.display = "none";
+  }
+}
+
+async function runNarrative(profile, report) {
+  nodes.narrativeSpinner.style.display = "inline-block";
+  nodes.narrativeContent.textContent = "";
+  nodes.narrativeCitations.innerHTML = "";
+
+  try {
+    const result = await fetchPerplexity("/api/narrative", {
+      address: profile.address,
+      network: profile.network,
+      score: report.score,
+      tier: report.tier,
+      action: report.action,
+      factors: report.factors,
+      osintSummary: aiState.osintResult?.content || ""
+    });
+    nodes.narrativeContent.textContent = result.content;
+    renderCitations(result.citations, nodes.narrativeCitations);
+  } catch (err) {
+    nodes.narrativeContent.textContent = `Narrative generation failed: ${err.message}`;
+  } finally {
+    nodes.narrativeSpinner.style.display = "none";
+  }
+}
+
+function appendChatBubble(role, text, citations) {
+  const div = document.createElement("div");
+  div.className = `chat-bubble chat-${role}`;
+  div.textContent = text;
+  nodes.chatMessages.appendChild(div);
+
+  if (citations && citations.length > 0) {
+    const citDiv = document.createElement("div");
+    citDiv.className = "chat-citations";
+    renderCitations(citations, citDiv);
+    nodes.chatMessages.appendChild(citDiv);
+  }
+
+  nodes.chatMessages.scrollTop = nodes.chatMessages.scrollHeight;
+}
+
+async function sendChatMessage() {
+  const text = nodes.chatInput.value.trim();
+  if (!text) return;
+
+  aiState.chatHistory.push({ role: "user", content: text });
+  appendChatBubble("user", text);
+  nodes.chatInput.value = "";
+  nodes.chatSendBtn.disabled = true;
+
+  try {
+    const result = await fetchPerplexity("/api/chat", {
+      messages: aiState.chatHistory,
+      walletContext: aiState.currentReport
+        ? {
+            address: aiState.currentProfile.address,
+            network: aiState.currentProfile.network,
+            score: aiState.currentReport.score,
+            tier: aiState.currentReport.tier,
+            factors: aiState.currentReport.factors
+          }
+        : null
+    });
+    aiState.chatHistory.push({ role: "assistant", content: result.content });
+    appendChatBubble("assistant", result.content, result.citations);
+  } catch (err) {
+    appendChatBubble("assistant", `Error: ${err.message}`);
+  } finally {
+    nodes.chatSendBtn.disabled = false;
+  }
+}
+
+async function triggerAI(profile, report) {
+  aiState.currentProfile = profile;
+  aiState.currentReport = report;
+  aiState.osintResult = null;
+  aiState.chatHistory = [];
+
+  nodes.osintContent.textContent = "";
+  nodes.osintCitations.innerHTML = "";
+  nodes.narrativeContent.textContent = "";
+  nodes.narrativeCitations.innerHTML = "";
+  nodes.chatMessages.innerHTML = "";
+
+  await runOsint(profile, report);
+  await runNarrative(profile, report);
 }
 
 function toTier(score) {
@@ -257,6 +416,7 @@ function runBasicAnalysis() {
   const report = calculateRisk(profile);
   renderReport(report);
   logWalletCheck(profile, report);
+  triggerAI(profile, report);
 }
 
 document.querySelectorAll(".scenario-btn").forEach((button) => {
@@ -268,6 +428,7 @@ document.querySelectorAll(".scenario-btn").forEach((button) => {
     const report = calculateRisk(profile);
     renderReport(report);
     logWalletCheck(profile, report);
+    triggerAI(profile, report);
   });
 });
 
@@ -282,7 +443,16 @@ nodes.csvInput.addEventListener("change", async (event) => {
     const report = calculateRisk(profile);
     renderReport(report);
     logWalletCheck(profile, report);
+    triggerAI(profile, report);
   } catch (err) {
     alert(`CSV parse error: ${err.message}`);
+  }
+});
+
+nodes.chatSendBtn.addEventListener("click", sendChatMessage);
+nodes.chatInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendChatMessage();
   }
 });

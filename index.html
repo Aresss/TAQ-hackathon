@@ -91,6 +91,30 @@
           <li>Run an analysis to see contributing factors.</li>
         </ul>
       </section>
+
+      <section class="panel" id="osintPanel">
+        <h2>OSINT Research <span class="spinner" id="osintSpinner"></span></h2>
+        <p class="hint">AI-powered open-source intelligence search for this wallet address.</p>
+        <div id="osintContent" class="ai-content">Run an analysis to see OSINT results.</div>
+        <div id="osintCitations" class="citations"></div>
+      </section>
+
+      <section class="panel" id="narrativePanel">
+        <h2>Compliance Narrative <span class="spinner" id="narrativeSpinner"></span></h2>
+        <p class="hint">SAR-ready investigation narrative combining scoring and OSINT findings.</p>
+        <div id="narrativeContent" class="ai-content">Run an analysis to generate a narrative.</div>
+        <div id="narrativeCitations" class="citations"></div>
+      </section>
+
+      <section class="panel" id="chatPanel">
+        <h2>Investigation Chat</h2>
+        <p class="hint">Ask follow-up questions. Perplexity AI searches in real-time with wallet context.</p>
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-input-row">
+          <input id="chatInput" type="text" placeholder="Ask about this wallet..." autocomplete="off" />
+          <button id="chatSendBtn">Send</button>
+        </div>
+      </section>
     </main>
 
     <script src="./app.js"></script>
